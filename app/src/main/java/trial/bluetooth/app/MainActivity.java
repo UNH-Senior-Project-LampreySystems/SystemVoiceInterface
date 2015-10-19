@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -32,6 +34,9 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<String> visibleDeviceList = new ArrayList<String>();
 
     private SpeechUtils sUtil;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
+    private Intent intent;
+
 
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -82,6 +87,11 @@ public class MainActivity extends ActionBarActivity {
         lv = (ListView) findViewById(R.id.listView);
 
         sUtil = new SpeechUtils(this);
+
+        intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
         // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -161,7 +171,8 @@ public class MainActivity extends ActionBarActivity {
     }
     */
 
-    private void pair(BluetoothDevice device) {
+    public void pair(int i) {
+        BluetoothDevice device = discovered.get(i);
         try {
             Method m = device.getClass().getMethod("createBond", (Class[]) null);
             m.invoke(device, (Object[]) null);
@@ -193,5 +204,31 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if(result.get(0).equals("pair"))
+                        pair(sUtil.getDevice());
+                    else if(result.get(0).equals("ignore"))
+                        sUtil.incrementDevice();
+                    else
+                        getConfirmation();
+
+                }
+                break;
+            }
+
+        }
+    }
+
+    public void getConfirmation()
+    {
+        startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
     }
 }
