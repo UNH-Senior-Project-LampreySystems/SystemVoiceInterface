@@ -11,12 +11,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -28,6 +27,7 @@ public class MainActivity extends ActionBarActivity {
     private Set<BluetoothDevice> pairedDevices;
     ListView lv;
 
+    private ArrayList<BluetoothDevice> discovered = new ArrayList<BluetoothDevice>();
     private ArrayList<String> visibleDeviceList = new ArrayList<String>();
 
     // Create a BroadcastReceiver for ACTION_FOUND
@@ -39,8 +39,20 @@ public class MainActivity extends ActionBarActivity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
-                visibleDeviceList.add(device.getName());
-                pair(device);
+                if(visibleDeviceList.isEmpty())
+                {
+                    visibleDeviceList.add(device.getName());
+                    discovered.add(device);
+                }
+                else
+                    for (String s : visibleDeviceList)
+                    {
+                        if (!s.equals(device.getName())) {
+                            visibleDeviceList.add(device.getName());
+                            discovered.add(device);
+                        }
+                    }
+
             }
         }
     };
@@ -63,6 +75,8 @@ public class MainActivity extends ActionBarActivity {
         b5 = (Button) findViewById(R.id.button5);
 
         BA = BluetoothAdapter.getDefaultAdapter();
+
+
         lv = (ListView) findViewById(R.id.listView);
 
         // Register the BroadcastReceiver
@@ -99,6 +113,7 @@ public class MainActivity extends ActionBarActivity {
      * @param v
      */
     public void visible(View v) {
+        visibleDeviceList = new ArrayList<String>();
         Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         startActivityForResult(getVisible, 0);
     }
@@ -107,15 +122,33 @@ public class MainActivity extends ActionBarActivity {
 
     /**
      * Get all devices paired and report them in list format
-     * @param v
      */
-    public void list(View v) {
-        pairedDevices = BA.getBondedDevices();
-        for(BluetoothDevice bt : pairedDevices)
-            visibleDeviceList.add(bt.getName());
+    public void list(View v)
+    {
+        for(int i = 0; i<visibleDeviceList.size(); i++)
+        {
+            if(visibleDeviceList.get(i).equals("NICK-PC"))
+                pair(discovered.get(i));
+        }
+
         final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, visibleDeviceList);
         lv.setAdapter(adapter);
     }
+
+    //--------------- list ----------------------------------
+
+    /**
+     * Get all devices paired and report them in list format
+     */
+    /**
+    public void listBonded() {
+        pairedDevices = BA.getBondedDevices();
+        for(BluetoothDevice bt : pairedDevices)
+            visibleDeviceList.add(bt.getName());
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, visibleDeviceList);
+        lv.setAdapter(adapter);
+    }
+    */
 
     private void pair(BluetoothDevice device) {
         try {
