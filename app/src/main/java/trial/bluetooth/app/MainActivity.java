@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -29,6 +30,8 @@ public class MainActivity extends ActionBarActivity {
 
     private ArrayList<BluetoothDevice> discovered = new ArrayList<BluetoothDevice>();
     private ArrayList<String> visibleDeviceList = new ArrayList<String>();
+
+    private SpeechUtils sUtil;
 
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -76,12 +79,14 @@ public class MainActivity extends ActionBarActivity {
 
         BA = BluetoothAdapter.getDefaultAdapter();
 
-
         lv = (ListView) findViewById(R.id.listView);
+
+        sUtil = new SpeechUtils(this);
 
         // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver,filter);
+
 
     }
 
@@ -125,11 +130,17 @@ public class MainActivity extends ActionBarActivity {
      */
     public void list(View v)
     {
+        /**
         for(int i = 0; i<visibleDeviceList.size(); i++)
         {
             if(visibleDeviceList.get(i).equals("NICK-PC"))
                 pair(discovered.get(i));
         }
+        */
+
+        sUtil.listDevices1(visibleDeviceList);
+
+
 
         final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, visibleDeviceList);
         lv.setAdapter(adapter);
