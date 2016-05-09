@@ -4,6 +4,7 @@
 #include "flite.h"
 #include "string.h"
 
+
 /* A global speech recognition variable */
 cst_voice *tts;
 int verbose;
@@ -52,4 +53,4 @@ void rs_verbosity_confirmation();
 void rs_reset();
 void rs_reset_confirmation();
 
-#endif _SPEECH_UTILS_H_
+#endif

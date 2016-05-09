@@ -1,4 +1,4 @@
-#include <pocketsphinx.h>
+/*#include <pocketsphinx.h>
 #include <ps_search.h>
 #include <string.h>
 #include <assert.h>
@@ -8,12 +8,18 @@
 #include <sphinxbase/fsg_model.h>
 #include <sphinxbase/ngram_model.h>
 
-static const char KWS[] = "key word search";
-static const char KEY_PHRASE[] = "wake";
-static const char GRS[] = "grammer search";
-static const char GRAMMAR_PATH[] = "menu.gram";
+KWS[] = "key word search";
+KEY_PHRASE[] = "wake";
+GRS[] = "grammer search";
+GRAMMAR_PATH[] = "menu.gram";
 
 ps_decoder_t *ps = NULL;	
+cmd_ln_t *config = NULL;
+*/
+
+#include "main-activity.h"
+
+ps_decoder_t *ps = NULL;
 cmd_ln_t *config = NULL;
 
 void sleep_msec(int32 ms)
@@ -24,7 +30,7 @@ void sleep_msec(int32 ms)
 	select(0, NULL, NULL, NULL, &tmo);
 }
 
-void recognize_from_microphone()
+void start_interaction()
 {
 	ad_rec_t *ad;
 	int16 adbuf[2048];
@@ -32,18 +38,20 @@ void recognize_from_microphone()
 	int32 k;
 	char const *hyp;
 
+	/* Set up the microphone */
 	if((ad = ad_open_dev(cmd_ln_str_r(config, "-adcdev"),
 			(int) cmd_ln_float32_r(config, "-samprate"
-						))) == NULL)
+							))) == NULL)
 		E_FATAL("Failed to open audio device\n");
 	if(ad_start_rec(ad) < 0)
 		E_FATAL("Failed to start recording\n");
 	
 	if(ps_start_utt(ps) < 0)
 		E_FATAL("Failed to start utterance\n");
+
+	/*Start the recognition */
 	utt_started = FALSE;
 	E_INFO("Ready...");
-
 	for(;;)
 	{
 		if((k = ad_read(ad, adbuf, 2048)) < 0)
@@ -61,9 +69,17 @@ void recognize_from_microphone()
 			hyp = ps_get_hyp(ps, NULL);
 			if(hyp != NULL)
 			{
+				if(strcmp(ps_get_search(ps), GRS) == 0)
+				{
+					ad_close(ad);
+					if(strcmp(hyp, "cancel") == 0)
+						cancel();
+					return;
+				}
+
+
 				if(strcmp(hyp, KEY_PHRASE) == 0)
 					ps_set_search(ps, GRS);
-				printf("%s\n", ps_get_search(ps));
 				printf("%s\n", hyp);
 				fflush(stdout);
 			}
@@ -77,8 +93,6 @@ void recognize_from_microphone()
 	}
 	ad_close(ad);
 }
-
-
 
 int
 main(int argc, char *argv[])
@@ -110,10 +124,11 @@ main(int argc, char *argv[])
 	/* Setup the grammar search */
 	ps_set_jsgf_file(ps, GRS, GRAMMAR_PATH);
 
+	/* Setup the text to speech */
+	speech_utils_init();
+
 	/* Begin Recognition */
-	recognize_from_microphone();
-
-
+	start_interaction();
 
 	return 0;
 }

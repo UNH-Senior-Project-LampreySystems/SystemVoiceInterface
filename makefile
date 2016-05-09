@@ -1,4 +1,7 @@
-all: main-activity
+all: clean main-activity
 
 main-activity:
-	gcc -o main-activity main-activity.c -DMODELDIR=\"`pkg-config --variable=modeldir pocketsphinx`\" `pkg-config --cflags --libs pocketsphinx sphinxbase`
+	gcc -g -o main-activity main-activity.c speechutils.c -DMODELDIR=\"`pkg-config --variable=modeldir pocketsphinx`\" `pkg-config --cflags --libs pocketsphinx sphinxbase` -I$(FLITEDIR)/include -L$(FLITEDIR)/lib -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex -lflite -lm
+
+clean:
+	-rm main-activity

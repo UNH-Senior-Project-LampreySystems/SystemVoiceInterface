@@ -1,4 +1,5 @@
 #include "speechutils.h"
+#include "main-activity.h"
 
 /* Setup Functions */
 void speech_utils_init()
@@ -39,8 +40,6 @@ void cancel()
 {
 	char *s = "Action cancelled";
 	speak(s);
-	
-	start_interaction();
 }
 
 /* Help Menus for Internet */
@@ -121,5 +120,3 @@ void rs_verbosity(){}
 void rs_verbosity_confirmation(){}
 void rs_reset(){}
 void rs_reset_confirmation(){}
-
-#endif _SPEECH_UTILS_H_
