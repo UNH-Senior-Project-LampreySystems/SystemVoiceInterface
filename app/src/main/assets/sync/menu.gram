@@ -1,0 +1,18 @@
+#JSGF V1.0;
+
+grammar menu;
+
+<initial> = internet | system | bluetooth ;
+<confirmation> = no | yes ;
+<connection> = connect | skip ;
+<other> = verbosity | noise | reset | status | connect ;
+<noise> = verbose | quiet ;
+<alphabetic> = a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z ;
+<dig> = zero | one | two | three | four | five | six | seven | eight | nine ;
+<special> = asterisk | underscore | plus | dash | question mark ;
+<char> = <alphabetic> | <dig> | <special> ;
+<charex> = <char> <charex> ;
+<precede> = capital | number | special ;
+<pass> = clear | cancel | back | done | help ;
+
+public <item> =  <initial> | <other> | <noise> | <confirmation> | <connection> | <precede> <char>| <char> | <pass> ;

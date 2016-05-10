@@ -1,0 +1,11 @@
+#JSGF V1.0;
+
+grammar ssid;
+
+<alphabetic> = a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z ;
+<dig> = zero | one | two | three | four | five | six | seven | eight | nine ;
+<special> = asterisk | underscore | plus | dash | question mark ;
+<char> =  <alphabetic> |  <dig> | <special> ;
+<pass> = cancel | done ;
+
+public <ssid> = <char> | <pass> ;
