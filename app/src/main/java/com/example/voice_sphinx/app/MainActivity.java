@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     private TextView textView;
     private SpeechRecognizer recognizer;
 
-    private int speechFailures = -200;
     private int node = 0;
     private SpeechUtils speechUtils;
     private String password = "";
@@ -191,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if(text.equals(KEYPHRASE))
         {
             textView.setText("Start");
-            speechUtils.initialResponse();
+            speechUtils.helpMenu0();
             switchSearch(GRAMMAR_SEARCH);
         }
     }
@@ -240,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     public void resetNode()
     {
         node = 0;
-        speechFailures = -200;
         password = "";
         switchSearch(KWS_SEARCH);
     }
@@ -274,9 +272,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             case 1212: // Internet needs a password
                 parseTo1212(tokens);
                 return;
-            case 2:     // Interact with the bluetooth
-                parseTo2(tokens);
-                return;
             case 3:     // Interact with the system
                 parseTo3(tokens);
                 return;
@@ -299,10 +294,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                     node = 1;
                     parseTo1(tokens);
                     return;
-                case "bluetooth":
-                    node = 2;
-                    parseTo2(tokens);
-                    return;
                 case "system":
                     node = 3;
                     parseTo3(tokens);
@@ -312,16 +303,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 0)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu0();
-            }
         }
     }
 
@@ -348,16 +330,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 1)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu1();
-            }
         }
     }
 
@@ -381,16 +354,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 12)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu12();
-            }
         }
     }
 
@@ -413,16 +377,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 1211)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu121();
-            }
         }
     }
 
@@ -442,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
             else if(!(isNumber(s) == -1))
                 networkName += isNumber(s);
             else
-                networkName += s;
+                networkName += s.substring(0,1);
         }
 
         switchSearch(ALL_SEARCH);
@@ -467,16 +422,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 1221)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
                 speechUtils.reply1221(password);
-            }
-            else
-            {
-                speechFailures++;
-                speechUtils.reply1221(password);
-            }
         }
     }
 
@@ -498,14 +444,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 password = "";
                 resetNode();
                 return;
-            case "number":
-                password += isNumber(tokens[1]);
-                speechUtils.reply12121Helper1(password);
-                return;
-            case "special":
-                password += isPunctuation(tokens[1]);
-                speechUtils.reply12121Helper1(password);
-                return;
             case "back":
                 if(password.length() >= 1)
                     password = password.substring(0,password.length()-1);
@@ -520,8 +458,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
                 speechUtils.helpMenu12121();
                 return;
             default:
-                if(s.contains("special") && s.length()>7)
-                    password += s.charAt(s.length()-1);
+                if(isNumber(tokens[0])!=-1)
+                    password += isNumber(tokens[0]);
+                else if(!isPunctuation(tokens[0]).equals(""))
+                    password += isPunctuation(tokens[0]);
                 else
                     password += s.substring(0, 1);
                 speechUtils.reply12121Helper1(password);
@@ -533,25 +473,25 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     {
         switch(s)
         {
-            case "zero":case "0":
+            case "zero":
             return 0;
-            case "one":case "1":
+            case "one":
             return 1;
-            case "two":case "too":case "to":case "2":
+            case "two":case "too":case "to":
             return 2;
-            case "three":case "3":
+            case "three":
             return 3;
-            case "four":case "for":case "4":
+            case "four":case "for":
             return 4;
-            case "five":case "5":
+            case "five":
             return 5;
-            case "six":case "6":
+            case "six":
             return 6;
-            case "seven":case "7":
+            case "seven":
             return 7;
-            case "eight":case"ate":case "8":
+            case "eight":case"ate":
             return 8;
-            case "nine":case "9":
+            case "nine":
             return 9;
             default:
                 return -1;
@@ -581,42 +521,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     //==============================================
-    // Parse for Bluetooth
-    //==============================================
-
-    public void parseTo2(String[] tokens)
-    {
-        //speechUtils.helpMenu2();
-
-        for(String s : tokens)
-        {
-            switch(s)
-            {
-                case "status":case"yes":
-                    node = 21;
-                    speechUtils.reply21();
-                    return;
-                case "no":
-                    speechUtils.cancel();
-                    return;
-            }
-        }
-
-        if(node == 2)
-        {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
-                speechUtils.helpMenu2();
-            }
-        }
-    }
-    //==============================================
     // Parse for System
     //==============================================
 
@@ -643,16 +547,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 3)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu3();
-            }
         }
     }
 
@@ -675,16 +570,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 32)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu32();
-            }
         }
     }
 
@@ -710,16 +596,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         if(node == 33)
         {
-            if (speechFailures >= 3)
-            {
-                node = 0;
-                speechUtils.retryLimitExceeded();
-            }
-            else
-            {
-                speechFailures++;
                 speechUtils.helpMenu33();
-            }
         }
     }
 

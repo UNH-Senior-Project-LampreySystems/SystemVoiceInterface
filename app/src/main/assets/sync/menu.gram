@@ -2,7 +2,7 @@
 
 grammar menu;
 
-<initial> = internet | system | bluetooth ;
+<initial> = internet | system ;
 <confirmation> = no | yes ;
 <connection> = connect | skip ;
 <other> = verbosity | noise | reset | status | connect ;

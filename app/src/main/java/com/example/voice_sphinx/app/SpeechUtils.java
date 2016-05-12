@@ -23,7 +23,6 @@ public class SpeechUtils{
     private int internetCurrentNode = 0;
     private ScanResult internetResult;
 
-    private BluetoothUtils bluetoothUtils;
 
     private SystemUtils systemUtils;
     private boolean verbose = true;
@@ -53,7 +52,6 @@ public class SpeechUtils{
         );
 
         internetUtils = new InternetUtils(ma);
-        bluetoothUtils = new BluetoothUtils(ma);
         systemUtils = new SystemUtils(ma);
     }
 
@@ -67,18 +65,11 @@ public class SpeechUtils{
     // The Initial Response
     //==============================================
 
-    public void initialResponse()
-    {
-        String s = "Yes?";
-        speak(s);
-        ma.start();
-    }
-
     public void helpMenu0()
     {
-        String s = "Internet, bluetooth, system.";
+        String s = "Internet, system.";
         if(verbose)
-            s = "Please say internet, bluetooth, or system to interact with there respective settings. Say cancel to stop the interaction at any time.";//"Would you like to interact with your internet, bluetooth, or system settings. Please say internet, bluetooth, or system.";
+            s = "Please say internet, or system to interact with there respective settings. Say cancel to stop the interaction at any time.";//"Would you like to interact with your internet, or system settings. Please say internet, or system.";
         speak(s);
         ma.start();
     }
@@ -86,13 +77,6 @@ public class SpeechUtils{
     public void cancel()
     {
         String s = "Action cancelled";
-        speak(s);
-        ma.resetNode();
-    }
-
-    public void retryLimitExceeded()
-    {
-        String s = "Sorry, the retry limit has been exceeded, please start the process again";
         speak(s);
         ma.resetNode();
     }
@@ -135,13 +119,14 @@ public class SpeechUtils{
     public void helpMenu12121()
     {
         String s = "Precede capital letters with the word capital, ";
-        s += "Precede numbers with the word number, ";
-        s += "Precede special characters with the word special. ";
-        s += "Say back to back the last character spoken. ";
+        //s += "Precede numbers with the word number, ";
+        //s += "Precede special characters with the word special. ";
+        s += "Say back to delete the last character spoken. ";
         s += "Say clear to delete all characters spoken. ";
         s += "Say cancel to stop connecting to this network.";
         speak(s);
-        ma.start();
+        //ma.start();
+        reply12121Helper0();
     }
 
     //----------------- return internet status --------
@@ -201,7 +186,6 @@ public class SpeechUtils{
 
     public void reply122()
     {
-//        String s = "What is the name of the network to which I should connect?";
         String s = "Please spell the name of the network and say done when finished.";
         speak(s);
         ma.startAmbiguous();
@@ -346,28 +330,6 @@ public class SpeechUtils{
                 return "plus";
         }
         return "";
-    }
-
-    //==============================================
-    // Bluetooth Responses
-    //==============================================
-
-    public void helpMenu2()
-    {
-        String s;
-        if(verbose)
-            s = "Would you like to know your bluetooth status? Please say yes or no?";
-        else
-            s = "Yes or no?";
-        speak(s);
-        ma.start();
-    }
-
-    public void reply21()
-    {
-        String s = bluetoothUtils.getStatus();
-        speak(s);
-        ma.resetNode();
     }
 
     //==============================================
