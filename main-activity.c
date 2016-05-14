@@ -1,26 +1,9 @@
-/*#include <pocketsphinx.h>
-#include <ps_search.h>
-#include <string.h>
-#include <assert.h>
-#include <sys/select.h>
-#include <sphinxbase/err.h>
-#include <sphinxbase/ad.h>
-#include <sphinxbase/fsg_model.h>
-#include <sphinxbase/ngram_model.h>
-
-KWS[] = "key word search";
-KEY_PHRASE[] = "wake";
-GRS[] = "grammer search";
-GRAMMAR_PATH[] = "menu.gram";
-
-ps_decoder_t *ps = NULL;	
-cmd_ln_t *config = NULL;
-*/
-
 #include "main-activity.h"
 
 ps_decoder_t *ps = NULL;
 cmd_ln_t *config = NULL;
+
+enum nodes node = START;
 
 void sleep_msec(int32 ms)
 {
@@ -73,8 +56,17 @@ void start_interaction()
 				{
 					ad_close(ad);
 					if(strcmp(hyp, "cancel") == 0)
+					{
 						cancel();
-					return;
+						ps_set_search(ps, KWS);
+						return;
+					}
+					else
+					{
+						char *tokens = (char*) hyp; 
+						parse_to_depth(tokens);
+						return;
+					}
 				}
 
 
@@ -92,6 +84,84 @@ void start_interaction()
 		sleep_msec(150);
 	}
 	ad_close(ad);
+}
+
+/****************************************
+ * parse speech input		
+ ****************************************/
+void parse_to_depth(char * tokens)
+{
+	switch(node)
+	{
+		case START:
+			parse_to_start(tokens);
+	}
+}
+
+void parse_to_start(char * token)
+{
+	if(strcmp(token, "internet") == 0)
+	{
+		node = INT_START;
+		hmi_start();	
+		return;
+	}
+	else if(strcmp(token, "system") == 0)
+	{
+		node = SYS_START;
+		hms_start();
+		return;
+	}
+	
+	if(node == START)
+		help_menu_initial();
+}
+
+/****************************************
+ * parse speech input for system		
+ ****************************************/
+void parse_to_system_start(char * token)
+{
+	if(strcmp(token, "status") == 0)
+	{
+		node = START;
+		rs_status();	
+		return;
+	}
+	else if(strcmp(token, "verbosity") == 0)
+	{
+		node = SYS_VERBOSITY;
+		hms_verbosity();
+		return;
+	}
+	else if(strcmp(token, "reset") == 0)
+	{
+		node = SYS_RESTART;
+		hms_restart();
+	}
+
+
+	if(node == SYS_START)
+		hms_start();
+}
+
+void parse_to_system_verboisty(char * token)
+{
+	if(strcmp(token, "yes") == 0)
+	{
+		node = START;
+		rs_verbosity(1);	
+		return;
+	}
+	else if(strcmp(token, "no") == 0)
+	{
+		node = START;
+		rs_verbosity(0);
+		return;
+	}
+
+	if(node == SYS_VERBOSITY)
+		hms_verbosity();
 }
 
 int
