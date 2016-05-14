@@ -48,9 +48,7 @@ void hms_restart();
 
 /* Replies for System */
 void rs_status();
-void rs_verbosity();
-void rs_verbosity_confirmation();
-void rs_reset();
-void rs_reset_confirmation();
+void rs_verbosity(int bool);
+void rs_reset(int bool);
 
 #endif

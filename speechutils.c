@@ -5,7 +5,7 @@
 void speech_utils_init()
 {
 	tts = register_cmu_us_kal("slt");
-	verbose = 0;
+	verbose = 1;
 	current_name = "trialnetwork";
 }
 
@@ -42,7 +42,9 @@ void cancel()
 	speak(s);
 }
 
-/* Help Menus for Internet */
+/************************
+ * Help menus for Internet
+ ************************/
 void hmi_start()
 {
 	char *s;
@@ -94,7 +96,9 @@ void hmi_password()
 	start_interaction();
 }
 
-/* Replies for Internet */
+/************************
+ * Replies for Internet
+ ************************/
 void ri_status(){}
 void ri_scan_connections(){}
 void ri_unknown_name(){}
@@ -109,14 +113,99 @@ void ri_password_get_char(){}
 void ri_password_get_punctuation(){}
 void ri_password_connecting(){}
 
-/* Help Menus for System */
-void hms_start(){}
-void hms_verbosity(){}
-void hms_restart(){}
+/************************
+ * Help menuse for System
+ ************************/
+void hms_start()
+{
+	char *s
+	if(verbose)
+	{
+		s = "Please say status to hear your system status, verbosity to set my response verbosity, or reset to reset the application.";
+	}
+	else
+	{
+		s = "Status, verbosity, reset.";
+	}
+	speak(s);
 
-/* Replies for System */
-void rs_status(){}
-void rs_verbosity(){}
-void rs_verbosity_confirmation(){}
-void rs_reset(){}
-void rs_reset_confirmation(){}
+	start_interaction();
+}
+
+void hms_verbosity()
+{
+	char *s
+	if(verbose)
+	{
+		s = "Replies are currently verbose, would you like them to remain verbose or switch to quiet. Please say quiet or verbose";	
+	}
+	else
+	{
+		s = "Currently quiet. Quiet or verbose?";
+	}
+	speak(s);
+
+	start_interaction();
+}
+
+void hms_restart()
+{
+	char *s;
+	if(verbose)
+	{
+		s = "Are you sure you want to reset the system? Please say yes or no.";
+	}
+	else
+	{
+		s = "Yes, no.";
+	}
+	speak(s);
+
+	start_interaction();
+}
+
+/************************
+ * Replies for System
+ ************************/
+void rs_status()
+{
+	char *s = get_system_status();
+	speak(s);
+
+	reset_interaction();
+}
+
+void rs_verbosity(int bool)
+{
+	char *s;
+	if(bool)
+	{
+		s = "Replies will now be verbose"; 
+	}
+	else
+	{
+		s = "Replies will now be quiet";
+	}
+	speak(s);
+	verbose = bool;
+
+	reset_interaction();
+}
+
+void rs_reset(int bool)
+{
+	char *s;
+	if(bool)
+	{
+		s = "The system will now reset";
+	}
+	else
+	{
+		s = "You have chosen to not reset the system";
+	}
+	speak(s);
+
+	reset_system();	
+	
+	reset_interaction();	
+}

@@ -58,7 +58,7 @@ void start_interaction()
 					if(strcmp(hyp, "cancel") == 0)
 					{
 						cancel();
-						ps_set_search(ps, KWS);
+						reset_application();
 						return;
 					}
 					else
@@ -86,6 +86,11 @@ void start_interaction()
 	ad_close(ad);
 }
 
+void reset_interaction()
+{
+	ps_set_search(ps, KWS);
+}
+
 /****************************************
  * parse speech input		
  ****************************************/
@@ -95,6 +100,16 @@ void parse_to_depth(char * tokens)
 	{
 		case START:
 			parse_to_start(tokens);
+			break;
+		case SYS_START:
+			parse_to_system_start(tokens);
+			break;
+		case SYS_VERBOSITY:
+			parse_to_system_verbosity(tokens);
+			break;
+		case SYS_RESET:
+			parse_to_system_reset(tokens);
+			break;
 	}
 }
 
@@ -157,6 +172,25 @@ void parse_to_system_verboisty(char * token)
 	{
 		node = START;
 		rs_verbosity(0);
+		return;
+	}
+
+	if(node == SYS_VERBOSITY)
+		hms_verbosity();
+}
+
+void parse_to_system_reset(char * token)
+{
+	if(strcmp(token, "verbose") == 0)
+	{
+		node = START;
+		rs_reset(1);	
+		return;
+	}
+	else if(strcmp(token, "quiet") == 0)
+	{
+		node = START;
+		rs_reset(0);
 		return;
 	}
 
