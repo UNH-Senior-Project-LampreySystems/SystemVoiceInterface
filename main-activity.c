@@ -58,7 +58,7 @@ void start_interaction()
 					if(strcmp(hyp, "cancel") == 0)
 					{
 						cancel();
-						reset_application();
+						reset_interaction();
 						return;
 					}
 					else
@@ -71,7 +71,11 @@ void start_interaction()
 
 
 				if(strcmp(hyp, KEY_PHRASE) == 0)
+				{
 					ps_set_search(ps, GRS);
+					ad_close(ad);
+					start_interaction();
+				}
 				printf("%s\n", hyp);
 				fflush(stdout);
 			}
@@ -89,6 +93,7 @@ void start_interaction()
 void reset_interaction()
 {
 	ps_set_search(ps, KWS);
+	start_interaction();
 }
 
 /****************************************
@@ -151,24 +156,26 @@ void parse_to_system_start(char * token)
 	}
 	else if(strcmp(token, "reset") == 0)
 	{
-		node = SYS_RESTART;
+		node = SYS_RESET;
 		hms_restart();
 	}
 
 
 	if(node == SYS_START)
+	{
 		hms_start();
+	}
 }
 
-void parse_to_system_verboisty(char * token)
+void parse_to_system_verbosity(char * token)
 {
-	if(strcmp(token, "yes") == 0)
+	if(strcmp(token, "verbose") == 0)
 	{
 		node = START;
 		rs_verbosity(1);	
 		return;
 	}
-	else if(strcmp(token, "no") == 0)
+	else if(strcmp(token, "quiet") == 0)
 	{
 		node = START;
 		rs_verbosity(0);
@@ -176,18 +183,21 @@ void parse_to_system_verboisty(char * token)
 	}
 
 	if(node == SYS_VERBOSITY)
+	{
+		fprintf(stderr, "\n\n\nERROR > %s\n\n\n", token);
 		hms_verbosity();
+	}
 }
 
 void parse_to_system_reset(char * token)
 {
-	if(strcmp(token, "verbose") == 0)
+	if(strcmp(token, "yes") == 0)
 	{
 		node = START;
 		rs_reset(1);	
 		return;
 	}
-	else if(strcmp(token, "quiet") == 0)
+	else if(strcmp(token, "no") == 0)
 	{
 		node = START;
 		rs_reset(0);

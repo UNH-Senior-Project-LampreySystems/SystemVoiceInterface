@@ -35,9 +35,11 @@ SYS_RESET
 void sleep_msec(int32 ms);
 void recognize_from_microphone();
 void start_interaction();
+void reset_interaction();
 
 void parse_to_depth(char * tokens);
 void parse_to_start(char * token);
+void parse_to_system_start(char * token);
 void parse_to_system_verbosity(char * token);
 void parse_to_system_reset(char * token);
 

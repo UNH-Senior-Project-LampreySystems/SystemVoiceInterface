@@ -1,5 +1,6 @@
 #include "speechutils.h"
 #include "main-activity.h"
+#include "systemutils.h"
 
 /* Setup Functions */
 void speech_utils_init()
@@ -27,9 +28,9 @@ void help_menu_initial()
 {
 	char *s;
 	if(verbose)
-		s = "Please say internet, bluetooth, or system to interact with their respective settings. Say cancel to stop the interaction at any time.";
+		s = "Please say internet, or system to interact with their respective settings. Say cancel to stop the interaction at any time.";
 	else
-		s = "Internet, bluetooth, system.";
+		s = "Internet, system.";
 	speak(s);
 	
 	start_interaction();
@@ -118,7 +119,7 @@ void ri_password_connecting(){}
  ************************/
 void hms_start()
 {
-	char *s
+	char *s;
 	if(verbose)
 	{
 		s = "Please say status to hear your system status, verbosity to set my response verbosity, or reset to reset the application.";
@@ -134,7 +135,7 @@ void hms_start()
 
 void hms_verbosity()
 {
-	char *s
+	char *s;
 	if(verbose)
 	{
 		s = "Replies are currently verbose, would you like them to remain verbose or switch to quiet. Please say quiet or verbose";	
@@ -169,7 +170,8 @@ void hms_restart()
  ************************/
 void rs_status()
 {
-	char *s = get_system_status();
+	char *s;
+	s = (char*) get_system_status();
 	speak(s);
 
 	reset_interaction();
