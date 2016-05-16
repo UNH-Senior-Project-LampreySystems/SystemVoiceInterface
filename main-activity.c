@@ -52,6 +52,11 @@ void start_interaction()
 			hyp = ps_get_hyp(ps, NULL);
 			if(hyp != NULL)
 			{
+				if(strcmp(hyp, KEY_PHRASE) == 0)
+				{
+					ps_set_search(ps, GRS);
+				}
+			
 				if(strcmp(ps_get_search(ps), GRS) == 0)
 				{
 					ad_close(ad);
@@ -70,12 +75,6 @@ void start_interaction()
 				}
 
 
-				if(strcmp(hyp, KEY_PHRASE) == 0)
-				{
-					ps_set_search(ps, GRS);
-					ad_close(ad);
-					start_interaction();
-				}
 				printf("%s\n", hyp);
 				fflush(stdout);
 			}
@@ -92,6 +91,7 @@ void start_interaction()
 
 void reset_interaction()
 {
+	node = START;
 	ps_set_search(ps, KWS);
 	start_interaction();
 }
@@ -105,6 +105,9 @@ void parse_to_depth(char * tokens)
 	{
 		case START:
 			parse_to_start(tokens);
+			break;
+		case INT_START:
+			parse_to_internet_start(tokens);
 			break;
 		case SYS_START:
 			parse_to_system_start(tokens);
@@ -138,6 +141,28 @@ void parse_to_start(char * token)
 }
 
 /****************************************
+ * parse speech input for internet		
+ ****************************************/
+void parse_to_internet_start(char * token)
+{
+	if(strcmp(token, "status") == 0)
+	{
+		node = START;
+		ri_status();
+	}
+	else if(strcmp(token, "connect") == 0)
+	{
+		node = INT_CONNECT;
+		hfi_scan_connections();
+	}
+
+	if(node == INT_START)
+		hmi_start();
+}
+
+
+
+/****************************************
  * parse speech input for system		
  ****************************************/
 void parse_to_system_start(char * token)
@@ -162,9 +187,7 @@ void parse_to_system_start(char * token)
 
 
 	if(node == SYS_START)
-	{
 		hms_start();
-	}
 }
 
 void parse_to_system_verbosity(char * token)
@@ -183,10 +206,7 @@ void parse_to_system_verbosity(char * token)
 	}
 
 	if(node == SYS_VERBOSITY)
-	{
-		fprintf(stderr, "\n\n\nERROR > %s\n\n\n", token);
 		hms_verbosity();
-	}
 }
 
 void parse_to_system_reset(char * token)

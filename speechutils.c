@@ -1,6 +1,9 @@
 #include "speechutils.h"
 #include "main-activity.h"
 #include "systemutils.h"
+#include "internetutils.h"
+
+struct connection_list* network_list;
 
 /* Setup Functions */
 void speech_utils_init()
@@ -98,12 +101,46 @@ void hmi_password()
 }
 
 /************************
+ * Helper functions for Internet
+ ************************/
+void hfi_scan_connections()
+{
+	char *s = "scanning for internet connections, please wait";
+	speak(s);
+	get_internet_scan();
+
+	if(network_list != NULL)
+		hmi_is_name_known();
+	else
+	{
+		char * s2 = "no connections found";
+		speak(s);
+		reset_interaction();
+	}
+}
+
+void hfi_unknown_name()
+{
+	
+}
+
+void hfi_unknwon_name_helper()
+{
+
+}
+
+/************************
  * Replies for Internet
  ************************/
-void ri_status(){}
-void ri_scan_connections(){}
-void ri_unknown_name(){}
-void ri_unknown_name_helper(){}
+void ri_status()
+{
+	char *s;
+	s = (char*) get_internet_status(); 
+	speak(s);	
+
+	reset_interaction();
+}
+
 void ri_known_name(){}
 void ri_known_confirmation(){}
 void ri_known_confirmation_cld(){}

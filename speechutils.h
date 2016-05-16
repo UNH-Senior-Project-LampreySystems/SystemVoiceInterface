@@ -20,17 +20,19 @@ void initial_response();
 void help_menu_initial();
 void cancel();
 
-/* Help Menus for voidernet */
+/* Help Menus for internet */
 void hmi_start();
 void hmi_is_name_known();
 void hmi_unknown_name();
 void hmi_password();
 
-/* Replies for voidernet */
+/* Helper functions for internet */
+void hfi_scan_connections();
+void hfi_unknown_name();
+void hfi_unknown_name_helper();
+
+/* Replies for internet */
 void ri_status();
-void ri_scan_connections();
-void ri_unknown_name();
-void ri_unknown_name_helper();
 void ri_known_name();
 void ri_known_confirmation();
 void ri_known_confirmation_cld();
