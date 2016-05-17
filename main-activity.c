@@ -4,6 +4,7 @@ ps_decoder_t *ps = NULL;
 cmd_ln_t *config = NULL;
 
 enum nodes node = START;
+static char network[100];
 
 void sleep_msec(int32 ms)
 {
@@ -115,6 +116,12 @@ void parse_to_depth(char * tokens)
 		case INT_UNKNOWN:
 			parse_to_internet_unknown(tokens);
 			break;
+		case INT_KNOWN:
+			parse_to_internet_known(tokens);
+			break;
+		case INT_CONF:
+			parse_to_internet_confirmation(tokens);
+			break;
 		case SYS_START:
 			parse_to_system_start(tokens);
 			break;
@@ -171,6 +178,7 @@ void parse_to_internet_is_known(char * token)
 	if(strcmp(token, "yes") == 0)
 	{
 		node = INT_KNOWN;	
+		hmi_known();
 		return;
 	}
 	else if(strcmp(token, "no") == 0)
@@ -197,8 +205,102 @@ void parse_to_internet_unknown(char * token)
 		return;
 	}
 
-	if(node == SYS_VERBOSITY)
+	if(node == INT_UNKNOWN)
 		hmi_unknown();
+}
+
+void parse_to_internet_known(char * token)
+{	
+	if(strcmp(token, "done") == 0)
+	{
+		node = INT_CONF;
+		hfi_known_comparison(network);
+		return;	
+	}
+	else
+	{		
+		if(!(strcmp(is_number(token), "error") == 0))
+			strcat(network, is_number(token));
+		else
+			strcat(network, is_special(token));
+		start_interaction();
+		return;
+	}
+}
+
+void parse_to_internet_confirmation(char * token)
+{
+	if(strcmp(token, "yes") == 0)
+	{
+		node = START;
+		return;	
+	}
+	else if(strcmp(token, "no") == 0)
+	{
+		node = INT_KNOWN;
+		network[0] = '\0';
+		hmi_known();
+		return;
+	}
+	
+	if(node == INT_CONF)
+		hmi_confirmation();
+}
+
+/****************************************
+ * Checks for specific strings		
+ ****************************************/
+char* is_number(char * token)
+{
+	static char ret[10];
+
+	if(strcmp(token, "one") == 0)
+		strcpy(ret, "1");
+	else if(strcmp(token, "two") == 0)
+		strcpy(ret, "2");
+	else if(strcmp(token, "three") == 0)
+		strcpy(ret, "3");
+	else if(strcmp(token, "four") == 0)
+		strcpy(ret, "4");
+	else if(strcmp(token, "five") == 0)
+		strcpy(ret, "5");
+	else if(strcmp(token, "six") == 0)
+		strcpy(ret, "6");
+	else if(strcmp(token, "seven") == 0)
+		strcpy(ret, "7");
+	else if(strcmp(token, "eight") == 0)
+		strcpy(ret, "8");
+	else if(strcmp(token, "nine") == 0)
+		strcpy(ret, "9");
+	else if(strcmp(token, "zero") == 0)
+		strcpy(ret, "0");
+	else
+		strcpy(ret, "error");
+
+	return ret;
+}
+
+char* is_special(char * token)
+{
+	static char ret[10];
+
+	if(strcmp(token, "asterisk") == 0)
+		strcpy(ret, "*");
+	else if(strcmp(token, "underscore") == 0)
+		strcpy(ret, "_");
+	else if(strcmp(token, "plus") == 0)
+		strcpy(ret, "+");
+	else if(strcmp(token, "dash") == 0)
+		strcpy(ret, "-");
+	else if(strcmp(token, "question mark") == 0)
+		strcpy(ret, "?");
+	else
+	{
+		ret[0] = token[0];
+		ret[1] = '\0';
+	}
+
+	return ret;
 }
 
 /****************************************
@@ -289,6 +391,9 @@ main(int argc, char *argv[])
 		fprintf(stderr, "\nFAILED TO CREATE RECOGNIZER\n");
 		return -1;
 	}
+
+	/* Setup the network name */
+	network[0] = '\0';
 
 	/* Setup the keyword search */
 	ps_set_keyphrase(ps, KWS, KEY_PHRASE);

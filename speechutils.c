@@ -3,6 +3,8 @@
 #include "systemutils.h"
 #include "internetutils.h"
 
+#define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
+
 struct connection_list* network_list;
 struct connection_list* current_network;
 
@@ -93,6 +95,33 @@ void hmi_unknown()
 	start_interaction();
 }
 
+void hmi_known()
+{
+	char *s = "Please spell the network name character by character, and say done when finished.";
+	speak(s);
+
+	start_interaction();
+}
+
+void hmi_confirmation()
+{
+	char s[300];
+	if(verbose)
+	{
+		strcpy(s, "Are you sure you want to connect to ");
+		strcat(s, current_network->c->name);
+		strcat(s, ". Please say yes or no");
+	}
+	else
+	{
+		strcpy(s, current_network->c->name);
+		strcat(s, " . Yes, no.");
+	}
+	speak(s);
+
+	start_interaction();
+}
+
 void hmi_password()
 {
 	char *s = "Precede capital letters with the word capital. Precede numbers with the word number. Precede special characters with the word special. Say back to delete the last character spoken. Say clear to delete all characters spoken. Say cancel to stop connecting to this network.";
@@ -143,6 +172,52 @@ void hfi_unknown_helper()
 	start_interaction();
 }
 
+void hfi_known_comparison(char *network)
+{
+	fprintf(stderr, "\n\n\n%s\n\n\n", network);
+
+
+	struct connection_list *temp_net = network_list;
+	unsigned int best = 999999;
+
+	while(temp_net != NULL)
+	{
+		unsigned int temp = hfi_compare(network, temp_net->c->name);
+		if(temp < best)
+		{
+			best = temp;
+			current_network = temp_net;
+			fprintf(stderr, "\n\n\n%s %u\n\n\n", current_network->c->name, best);
+
+		}
+
+		temp_net = temp_net->next;
+	}
+
+	fprintf(stderr, "\n\n\n%s %u\n\n\n", current_network->c->name, best);
+
+	hmi_confirmation();
+}
+
+unsigned int hfi_compare(char *s1, char *s2)
+{
+	unsigned int x, y, s1len, s2len;
+	s1len = strlen(s1);
+	s2len = strlen(s2);
+
+	unsigned int matrix[s2len+1][s1len+1];
+	matrix[0][0] = 0;
+	for(x = 1; x <= s2len; x++)
+		matrix[x][0] = matrix[x-1][0] + 1;
+	for(y = 1; y <= s1len; y++)
+		matrix[0][y] = matrix[0][y-1] + 1;
+	for(x = 1; x <= s2len; x++)
+		for(y = 1; y <=s1len; y++)
+			matrix[x][y] = MIN3(matrix[x-1][y] + 1, matrix[x][y-1] + 1, matrix[x-1][y-1] + (s1[y-1] == s2[x-1] ? 0 : 1));
+
+	return(matrix[s2len][s1len]);
+}
+
 /************************
  * Replies for Internet
  ************************/
@@ -155,9 +230,6 @@ void ri_status()
 	reset_interaction();
 }
 
-void ri_known_name(){}
-void ri_known_confirmation(){}
-void ri_known_confirmation_cld(){}
 void ri_public_connecting(){}
 void ri_password(){}
 void ri_password_character(){}

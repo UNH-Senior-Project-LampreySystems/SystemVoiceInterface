@@ -23,18 +23,19 @@ void cancel();
 void hmi_start();
 void hmi_is_known();
 void hmi_unknown();
+void hmi_known();
+void hmi_confirmation();
 void hmi_password();
 
 /* Helper functions for internet */
 void hfi_scan_connections();
 void hfi_unknown();
 void hfi_unknown_helper();
+void hfi_known_comparison();
+unsigned int hfi_compare(char *s1, char *s2);
 
 /* Replies for internet */
 void ri_status();
-void ri_known_name();
-void ri_known_confirmation();
-void ri_known_confirmation_cld();
 void ri_public_connecting();
 void ri_password();
 void ri_password_character();
