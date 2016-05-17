@@ -4,13 +4,14 @@
 #include "internetutils.h"
 
 struct connection_list* network_list;
+struct connection_list* current_network;
+
 
 /* Setup Functions */
 void speech_utils_init()
 {
 	tts = register_cmu_us_kal("slt");
 	verbose = 1;
-	current_name = "trialnetwork";
 }
 
 void speak(const char* s)
@@ -61,7 +62,7 @@ void hmi_start()
 	start_interaction();
 }
 
-void hmi_is_name_known()
+void hmi_is_known()
 {
 	char *s;
 	if(verbose)
@@ -73,18 +74,18 @@ void hmi_is_name_known()
 	start_interaction();
 }
 
-void hmi_unknown_name()
+void hmi_unknown()
 {
 	char *s;
 	if(verbose)
 	{	
 		s = "Please say connect to connect to ";
-		strcat(s, current_name);
+		strcat(s, current_network->c->name);
 		strcat(s, " say skip to move to the next network");	
 	}
 	else
 	{
-		s = current_name;
+		s = current_network->c->name;
 		strcat(s, ", skip, connect.");
 	}
 	speak(s);
@@ -110,7 +111,9 @@ void hfi_scan_connections()
 	get_internet_scan();
 
 	if(network_list != NULL)
-		hmi_is_name_known();
+	{
+		hmi_is_known();
+	}
 	else
 	{
 		char * s2 = "no connections found";
@@ -119,14 +122,25 @@ void hfi_scan_connections()
 	}
 }
 
-void hfi_unknown_name()
+void hfi_unknown()
 {
+	char *s = "I will now list all the networks 1 by 1, please say connect to connect to the network or skip to list the next network.";
+	speak(s);	
 	
+	hfi_unknown_helper();
 }
 
-void hfi_unknwon_name_helper()
+void hfi_unknown_helper()
 {
+	if(current_network != NULL && current_network->next != NULL)
+		current_network = current_network->next;
+	else
+		current_network = network_list;
 
+	char *s = current_network->c->name;
+	speak(s);
+	
+	start_interaction();
 }
 
 /************************

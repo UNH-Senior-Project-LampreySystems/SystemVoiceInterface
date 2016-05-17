@@ -109,6 +109,12 @@ void parse_to_depth(char * tokens)
 		case INT_START:
 			parse_to_internet_start(tokens);
 			break;
+		case INT_CONNECT:
+			parse_to_internet_is_known(tokens);
+			break;
+		case INT_UNKNOWN:
+			parse_to_internet_unknown(tokens);
+			break;
 		case SYS_START:
 			parse_to_system_start(tokens);
 			break;
@@ -160,7 +166,40 @@ void parse_to_internet_start(char * token)
 		hmi_start();
 }
 
+void parse_to_internet_is_known(char * token)
+{
+	if(strcmp(token, "yes") == 0)
+	{
+		node = INT_KNOWN;	
+		return;
+	}
+	else if(strcmp(token, "no") == 0)
+	{
+		node = INT_UNKNOWN;
+		hfi_unknown();
+		return;
+	}
 
+	if(node == INT_CONNECT)
+		hmi_is_known();
+}
+
+void parse_to_internet_unknown(char * token)
+{
+	if(strcmp(token, "connect") == 0)
+	{
+		node = START;	
+		return;
+	}
+	else if(strcmp(token, "skip") == 0)
+	{
+		hfi_unknown_helper();
+		return;
+	}
+
+	if(node == SYS_VERBOSITY)
+		hmi_unknown();
+}
 
 /****************************************
  * parse speech input for system		
@@ -225,7 +264,7 @@ void parse_to_system_reset(char * token)
 	}
 
 	if(node == SYS_VERBOSITY)
-		hms_verbosity();
+		hms_restart();
 }
 
 int
@@ -253,10 +292,12 @@ main(int argc, char *argv[])
 
 	/* Setup the keyword search */
 	ps_set_keyphrase(ps, KWS, KEY_PHRASE);
-	ps_set_search(ps, KWS); 
+	/* ps_set_search(ps, KWS); */
 
 	/* Setup the grammar search */
 	ps_set_jsgf_file(ps, GRS, GRAMMAR_PATH);
+	ps_set_search(ps, GRS);
+	node = INT_START;
 
 	/* Setup the text to speech */
 	speech_utils_init();

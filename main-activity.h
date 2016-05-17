@@ -41,6 +41,9 @@ void parse_to_depth(char * tokens);
 void parse_to_start(char * token);
 
 void parse_to_internet_start(char * token);
+void parse_to_internet_is_known(char * token); 
+void parse_to_internet_unknown(char * token);
+
 
 void parse_to_system_start(char * token);
 void parse_to_system_verbosity(char * token);

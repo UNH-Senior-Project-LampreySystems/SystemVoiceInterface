@@ -8,7 +8,6 @@
 /* A global speech recognition variable */
 cst_voice *tts;
 int verbose;
-char *current_name;
 
 /* Setup Functions */
 cst_voice* register_cmu_us_kal(const char*);
@@ -22,14 +21,14 @@ void cancel();
 
 /* Help Menus for internet */
 void hmi_start();
-void hmi_is_name_known();
-void hmi_unknown_name();
+void hmi_is_known();
+void hmi_unknown();
 void hmi_password();
 
 /* Helper functions for internet */
 void hfi_scan_connections();
-void hfi_unknown_name();
-void hfi_unknown_name_helper();
+void hfi_unknown();
+void hfi_unknown_helper();
 
 /* Replies for internet */
 void ri_status();
