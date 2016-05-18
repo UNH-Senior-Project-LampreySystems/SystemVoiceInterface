@@ -6,6 +6,10 @@ Note that this is just an outline of the voice interaction meant to be a proof o
 ## Dependencies
 This program requires the following to be installed on your linux machine:
 * CMUSphinx: http://cmusphinx.sourceforge.net/
+  * Add these two lines to the file cmudict-en-us.dict (located in /usr/local/share/pocketsphinx/model/en-us)
+    * verbose V ER B OW S
+    * verbosity V ER B AA S IH T IY
+
 * CMUFlite: http://www.festvox.org/flite/
 
 ## Building
