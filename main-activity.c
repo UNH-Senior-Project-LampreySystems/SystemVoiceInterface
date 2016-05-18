@@ -451,12 +451,11 @@ main(int argc, char *argv[])
 
 	/* Setup the keyword search */
 	ps_set_keyphrase(ps, KWS, KEY_PHRASE);
-	/* ps_set_search(ps, KWS); */
+	ps_set_search(ps, KWS);
 
 	/* Setup the grammar search */
 	ps_set_jsgf_file(ps, GRS, GRAMMAR_PATH);
-	ps_set_search(ps, GRS);
-	node = INT_START;
+	node = START;
 
 	/* Setup the text to speech */
 	speech_utils_init();
