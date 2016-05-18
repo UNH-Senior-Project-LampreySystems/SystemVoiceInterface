@@ -204,7 +204,7 @@ void parse_to_internet_unknown(char * token)
 	if(strcmp(token, "connect") == 0)
 	{
 		node = INT_PASS;	
-		hmi_connect();
+		ri_connect();
 		return;
 	}
 	else if(strcmp(token, "skip") == 0)
@@ -241,7 +241,7 @@ void parse_to_internet_confirmation(char * token)
 	if(strcmp(token, "yes") == 0)
 	{
 		node = INT_PASS;
-		hmi_connect();
+		ri_connect();
 		return;	
 	}
 	else if(strcmp(token, "no") == 0)
@@ -284,7 +284,7 @@ void parse_to_internet_password(char * token)
 	else if(strcmp(token, "done") == 0)
 	{
 		node = START;
-		hmi_connect_password(password);	
+		ri_connect_password(password);	
 	}
 	else if(strcmp(token, "help") == 0)
 	{

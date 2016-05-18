@@ -25,9 +25,7 @@ void hmi_is_known();
 void hmi_unknown();
 void hmi_known();
 void hmi_confirmation();
-void hmi_connect();
 void hmi_password();
-void hmi_connect_password(char *password);
 
 /* Helper functions for internet */
 void hfi_scan_connections();
@@ -39,12 +37,8 @@ void hfi_password(char *c);
 
 /* Replies for internet */
 void ri_status();
-void ri_public_connecting();
-void ri_password();
-void ri_password_character();
-void ri_password_get_char();
-void ri_password_get_punctuation();
-void ri_password_connecting();
+void ri_connect();
+void ri_connect_password(char *password);
 
 /* Help Menus for System */
 void hms_start();

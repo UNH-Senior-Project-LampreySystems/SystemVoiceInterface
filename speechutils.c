@@ -122,56 +122,12 @@ void hmi_confirmation()
 	start_interaction();
 }
 
-void hmi_connect()
-{
-	if(current_network->c->password)
-	{
-		char s[300];
-		strcpy(s, "This network requires a password. Please say the first character of the password or help for more options");
-		speak(s);
-		start_interaction();
-	}
-	else
-	{
-		char s[300];
-		if(get_internet_connect(current_network->c))
-		{
-			strcpy(s, "successfully connected to ");
-			strcat(s, current_network->c->name);
-		}
-		else
-		{
-			strcpy(s, "could not connect to ");
-			strcat(s, current_network->c->name);
-		}
-		speak(s);
-		reset_interaction();
-	}
-}
-
 void hmi_password()
 {
 	char *s = "Precede capital letters with the word capital. Precede numbers with the word number. Precede special characters with the word special. Say back to delete the last character spoken. Say clear to delete all characters spoken. Say cancel to stop connecting to this network.";
 	speak(s);
 	
 	start_interaction();
-}
-
-void hmi_connect_password(char *password)
-{
-	char s[300];
-	if(get_internet_connect_password(current_network->c, password))
-	{
-		strcpy(s, "successfully connected to ");
-		strcat(s, current_network->c->name);
-	}
-	else
-	{
-		strcpy(s, "could not connect to ");
-		strcat(s, current_network->c->name);
-	}
-	speak(s);
-	reset_interaction();
 }
 
 /************************
@@ -285,12 +241,49 @@ void ri_status()
 	reset_interaction();
 }
 
-void ri_public_connecting(){}
-void ri_password(){}
-void ri_password_character(){}
-void ri_password_get_char(){}
-void ri_password_get_punctuation(){}
-void ri_password_connecting(){}
+void ri_connect()
+{
+	if(current_network->c->password)
+	{
+		char s[300];
+		strcpy(s, "This network requires a password. Please say the first character of the password or help for more options");
+		speak(s);
+		start_interaction();
+	}
+	else
+	{
+		char s[300];
+		if(get_internet_connect(current_network->c))
+		{
+			strcpy(s, "successfully connected to ");
+			strcat(s, current_network->c->name);
+		}
+		else
+		{
+			strcpy(s, "could not connect to ");
+			strcat(s, current_network->c->name);
+		}
+		speak(s);
+		reset_interaction();
+	}
+}
+
+void ri_connect_password(char *password)
+{
+	char s[300];
+	if(get_internet_connect_password(current_network->c, password))
+	{
+		strcpy(s, "successfully connected to ");
+		strcat(s, current_network->c->name);
+	}
+	else
+	{
+		strcpy(s, "could not connect to ");
+		strcat(s, current_network->c->name);
+	}
+	speak(s);
+	reset_interaction();
+}
 
 /************************
  * Help menuse for System
