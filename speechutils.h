@@ -25,7 +25,9 @@ void hmi_is_known();
 void hmi_unknown();
 void hmi_known();
 void hmi_confirmation();
+void hmi_connect();
 void hmi_password();
+void hmi_connect_password(char *password);
 
 /* Helper functions for internet */
 void hfi_scan_connections();
@@ -33,6 +35,7 @@ void hfi_unknown();
 void hfi_unknown_helper();
 void hfi_known_comparison();
 unsigned int hfi_compare(char *s1, char *s2);
+void hfi_password(char *c);
 
 /* Replies for internet */
 void ri_status();

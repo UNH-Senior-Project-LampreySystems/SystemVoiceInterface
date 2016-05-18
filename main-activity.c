@@ -5,6 +5,7 @@ cmd_ln_t *config = NULL;
 
 enum nodes node = START;
 static char network[100];
+static char password[100];
 
 void sleep_msec(int32 ms)
 {
@@ -94,6 +95,9 @@ void reset_interaction()
 {
 	node = START;
 	ps_set_search(ps, KWS);
+	network[0] = '\0';
+	password[0] = '\0';
+	
 	start_interaction();
 }
 
@@ -121,6 +125,9 @@ void parse_to_depth(char * tokens)
 			break;
 		case INT_CONF:
 			parse_to_internet_confirmation(tokens);
+			break;
+		case INT_PASS:
+			parse_to_internet_password(tokens);
 			break;
 		case SYS_START:
 			parse_to_system_start(tokens);
@@ -196,7 +203,8 @@ void parse_to_internet_unknown(char * token)
 {
 	if(strcmp(token, "connect") == 0)
 	{
-		node = START;	
+		node = INT_PASS;	
+		hmi_connect();
 		return;
 	}
 	else if(strcmp(token, "skip") == 0)
@@ -232,7 +240,8 @@ void parse_to_internet_confirmation(char * token)
 {
 	if(strcmp(token, "yes") == 0)
 	{
-		node = START;
+		node = INT_PASS;
+		hmi_connect();
 		return;	
 	}
 	else if(strcmp(token, "no") == 0)
@@ -245,6 +254,51 @@ void parse_to_internet_confirmation(char * token)
 	
 	if(node == INT_CONF)
 		hmi_confirmation();
+}
+
+void parse_to_internet_password(char * token)
+{
+	if(strcmp(token, "back") == 0)
+	{
+		if(strlen(password) >= 1)
+		{
+			password[strlen(password)-1] = '\0';
+		}
+		hfi_password(token);
+	}
+	else if(token[0] == 'c' && token[1] == 'a')
+	{
+		char temp[2];
+		temp[0] = toupper(token[8]);
+		temp[1] = '\0';
+
+		strcat(password, temp);	
+
+		hfi_password(token);
+	}
+	else if(strcmp(token, "clear") == 0)
+	{
+		password[0] = '\0';
+		hfi_password(token);
+	}
+	else if(strcmp(token, "done") == 0)
+	{
+		node = START;
+		hmi_connect_password(password);	
+	}
+	else if(strcmp(token, "help") == 0)
+	{
+		hmi_password();
+	}
+	else
+	{	
+		if(!(strcmp(is_number(token), "error") == 0))
+			strcat(password, is_number(token));
+		else
+			strcat(password, is_special(token));
+		
+		hfi_password(token);
+	}
 }
 
 /****************************************

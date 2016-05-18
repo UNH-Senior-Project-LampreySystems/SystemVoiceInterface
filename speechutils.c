@@ -122,12 +122,56 @@ void hmi_confirmation()
 	start_interaction();
 }
 
+void hmi_connect()
+{
+	if(current_network->c->password)
+	{
+		char s[300];
+		strcpy(s, "This network requires a password. Please say the first character of the password or help for more options");
+		speak(s);
+		start_interaction();
+	}
+	else
+	{
+		char s[300];
+		if(get_internet_connect(current_network->c))
+		{
+			strcpy(s, "successfully connected to ");
+			strcat(s, current_network->c->name);
+		}
+		else
+		{
+			strcpy(s, "could not connect to ");
+			strcat(s, current_network->c->name);
+		}
+		speak(s);
+		reset_interaction();
+	}
+}
+
 void hmi_password()
 {
 	char *s = "Precede capital letters with the word capital. Precede numbers with the word number. Precede special characters with the word special. Say back to delete the last character spoken. Say clear to delete all characters spoken. Say cancel to stop connecting to this network.";
 	speak(s);
 	
 	start_interaction();
+}
+
+void hmi_connect_password(char *password)
+{
+	char s[300];
+	if(get_internet_connect_password(current_network->c, password))
+	{
+		strcpy(s, "successfully connected to ");
+		strcat(s, current_network->c->name);
+	}
+	else
+	{
+		strcpy(s, "could not connect to ");
+		strcat(s, current_network->c->name);
+	}
+	speak(s);
+	reset_interaction();
 }
 
 /************************
@@ -216,6 +260,17 @@ unsigned int hfi_compare(char *s1, char *s2)
 			matrix[x][y] = MIN3(matrix[x-1][y] + 1, matrix[x][y-1] + 1, matrix[x-1][y-1] + (s1[y-1] == s2[x-1] ? 0 : 1));
 
 	return(matrix[s2len][s1len]);
+}
+
+void hfi_password(char *c)
+{
+	char s[300];
+	strcpy(s, "I heard ");
+	strcat(s, c);
+	strcat(s, ". Next character.");
+	speak(s);
+	
+	start_interaction();
 }
 
 /************************
